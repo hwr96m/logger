@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//------------ Константы, переменные ----------------------------------------------------
+// ------------ Константы, переменные ----------------------------------------------------
 const (
 	DEBUG LogType_t = "DEBUG"
 	INFO  LogType_t = "INFO"
@@ -17,19 +17,19 @@ const (
 
 var ()
 
-//------------ Типы ----------------------------------------------------
+// ------------ Типы ----------------------------------------------------
 type Logger_t struct {
 	DebugMode      bool         //режим отладки
-	dbLogger       []DBLogger_t //интерфейсы записи логов в бд
+	dbLogger       []DBLogger_i //интерфейсы записи логов в бд
 	openedFiles    []*os.File   //файлы, открытые через AddFile()
 	ioWriterLogger []io.Writer  //интерфейс записи логов в io.Writer
 }
-type DBLogger_t interface {
+type DBLogger_i interface {
 	Write(t time.Time, logType, msg string, vars map[string]interface{}) error
 }
 type LogType_t string
 
-//------------ Функции ----------------------------------------------------
+// ------------ Функции ----------------------------------------------------
 func New() *Logger_t {
 	l := new(Logger_t)
 	return l
@@ -40,7 +40,7 @@ func (l *Logger_t) Close() {
 	}
 	l = nil
 }
-func (l *Logger_t) AddDB(db DBLogger_t) error {
+func (l *Logger_t) AddDB(db DBLogger_i) error {
 	for _, v := range l.dbLogger {
 		if v == db {
 			return fmt.Errorf("бд уже добавлена")
@@ -69,8 +69,8 @@ func (l *Logger_t) AddIOWriter(w io.Writer) error {
 	return nil
 }
 
-//Запись лога в приёмники
-//logType - тип лога, msg - текст сообщения, vars - переменные, преобразуются в JSON строку
+// Запись лога в приёмники
+// logType - тип лога, msg - текст сообщения, vars - переменные, преобразуются в JSON строку
 func (l *Logger_t) Print(logType LogType_t, msg string, vars map[string]interface{}) {
 	//пропускаем DEBUG логи, если режим отладки отключен
 	if (logType == DEBUG) && !l.DebugMode {
@@ -83,7 +83,7 @@ func (l *Logger_t) Print(logType LogType_t, msg string, vars map[string]interfac
 	l.printIntoIOWriters(string(logType), msg, vars) //запись логов в ioWriterLogger
 }
 
-//записывает лог в БД.
+// записывает лог в БД.
 func (l *Logger_t) printIntoDB(logType LogType_t, msg string, vars map[string]interface{}) error {
 	for i := range l.dbLogger {
 		err := l.dbLogger[i].Write(time.Now(), string(logType), msg, vars)
@@ -94,7 +94,7 @@ func (l *Logger_t) printIntoDB(logType LogType_t, msg string, vars map[string]in
 	return nil
 }
 
-//записывает лог в ioWriter
+// записывает лог в ioWriter
 func (l *Logger_t) printIntoIOWriters(logType, msg string, vars map[string]interface{}) {
 	miltiWriter := io.MultiWriter(l.ioWriterLogger...)
 	str := fmt.Sprintf("%s  %s\t", time.Now().Format("2006-01-02 15:04:05"), logType)
