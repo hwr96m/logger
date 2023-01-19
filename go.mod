@@ -1,3 +1,3 @@
-module github.com/hwr96m/logger
+module home.rep/go-lib/logger.git
 
 go 1.19
