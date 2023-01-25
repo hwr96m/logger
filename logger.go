@@ -19,14 +19,20 @@ var ()
 
 // ------------ Типы ----------------------------------------------------
 type Logger_t struct {
-	DebugMode      bool         //режим отладки
-	dbLogger       []DBLogger_i //интерфейсы записи логов в бд
-	openedFiles    []*os.File   //файлы, открытые через AddFile()
-	ioWriterLogger []io.Writer  //интерфейс записи логов в io.Writer
+	DebugMode      bool //режим отладки
+	dbLogger       []dbLogger_t
+	openedFiles    []*os.File  //файлы, открытые через AddFile()
+	ioWriterLogger []io.Writer //интерфейс записи логов в io.Writer
 }
 type DBLogger_i interface {
-	Write(t time.Time, logType, msg string, vars map[string]interface{}) error
+	LogWrite(table string, logType, msg string, vars map[string]interface{}) error
 }
+
+type dbLogger_t struct {
+	db    DBLogger_i //интерфейсы записи логов в бд
+	table string     //название таблицы логов
+}
+
 type LogType_t string
 
 // ------------ Функции ----------------------------------------------------
@@ -40,16 +46,16 @@ func (l *Logger_t) Close() {
 	}
 	l = nil
 }
-func (l *Logger_t) AddDB(db DBLogger_i) error {
+func (l *Logger_t) AddDB(db DBLogger_i, table string) error {
 	for _, v := range l.dbLogger {
-		if v == db {
+		if v.db == db && v.table == table {
 			return fmt.Errorf("бд уже добавлена")
 		}
 	}
 	if db == nil {
 		return fmt.Errorf("db = nil")
 	}
-	l.dbLogger = append(l.dbLogger, db)
+	l.dbLogger = append(l.dbLogger, dbLogger_t{db, table})
 	return nil
 }
 func (l *Logger_t) AddFile(path string) error {
@@ -85,8 +91,8 @@ func (l *Logger_t) Print(logType LogType_t, msg string, vars map[string]interfac
 
 // записывает лог в БД.
 func (l *Logger_t) printIntoDB(logType LogType_t, msg string, vars map[string]interface{}) error {
-	for i := range l.dbLogger {
-		err := l.dbLogger[i].Write(time.Now(), string(logType), msg, vars)
+	for _, v := range l.dbLogger {
+		err := v.db.LogWrite(v.table, string(logType), msg, vars)
 		if err != nil {
 			return err
 		}
