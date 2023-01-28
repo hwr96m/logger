@@ -10,12 +10,17 @@ import (
 
 // ------------ Константы, переменные ----------------------------------------------------
 const (
-	DEBUG LogType_t = "DEBUG"
-	INFO  LogType_t = "INFO"
-	ERROR LogType_t = "ERROR"
+	DEBUG LogType_t = 0
+	INFO  LogType_t = 1
+	ERROR LogType_t = 2
 )
 
-var ()
+var (
+	LogTypeMap = map[LogType_t]string{
+		0: "DEBUG",
+		1: "INFO",
+		2: "ERROR"}
+)
 
 // ------------ Типы ----------------------------------------------------
 type Logger_t struct {
@@ -25,7 +30,7 @@ type Logger_t struct {
 	ioWriterLogger []io.Writer //интерфейс записи логов в io.Writer
 }
 type DBLogger_i interface {
-	LogWrite(table string, logType, msg string, vars map[string]interface{}) error
+	LogWrite(table string, logType byte, msg string, vars map[string]interface{}) error
 }
 
 type dbLogger_t struct {
@@ -33,7 +38,7 @@ type dbLogger_t struct {
 	table string     //название таблицы логов
 }
 
-type LogType_t string
+type LogType_t byte
 
 // ------------ Функции ----------------------------------------------------
 func New() *Logger_t {
@@ -84,15 +89,15 @@ func (l *Logger_t) Print(logType LogType_t, msg string, vars map[string]interfac
 	}
 	err := l.printIntoDB(logType, msg, vars) //запись логов в бд
 	if err != nil {
-		l.printIntoIOWriters(string(ERROR), fmt.Sprintf("logger: printIntoDB(): %s", err), nil) //при ошибке пишем лог в ioWriterLogger
+		l.printIntoIOWriters(ERROR, fmt.Sprintf("logger: printIntoDB(): %s", err), nil) //при ошибке пишем лог в ioWriterLogger
 	}
-	l.printIntoIOWriters(string(logType), msg, vars) //запись логов в ioWriterLogger
+	l.printIntoIOWriters(logType, msg, vars) //запись логов в ioWriterLogger
 }
 
 // записывает лог в БД.
 func (l *Logger_t) printIntoDB(logType LogType_t, msg string, vars map[string]interface{}) error {
 	for _, v := range l.dbLogger {
-		err := v.db.LogWrite(v.table, string(logType), msg, vars)
+		err := v.db.LogWrite(v.table, byte(logType), msg, vars)
 		if err != nil {
 			return err
 		}
@@ -101,9 +106,9 @@ func (l *Logger_t) printIntoDB(logType LogType_t, msg string, vars map[string]in
 }
 
 // записывает лог в ioWriter
-func (l *Logger_t) printIntoIOWriters(logType, msg string, vars map[string]interface{}) {
+func (l *Logger_t) printIntoIOWriters(logType LogType_t, msg string, vars map[string]interface{}) {
 	miltiWriter := io.MultiWriter(l.ioWriterLogger...)
-	str := fmt.Sprintf("%s  %s\t", time.Now().Format("2006-01-02 15:04:05"), logType)
+	str := fmt.Sprintf("%s  %s\t", time.Now().Format("2006-01-02 15:04:05"), LogTypeMap[logType])
 	if msg != "" {
 		str += fmt.Sprintf("\t%s ", msg)
 	}
