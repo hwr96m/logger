@@ -105,7 +105,7 @@ func (l *Logger_t) printIntoIOWriters(logType, msg string, vars map[string]inter
 	miltiWriter := io.MultiWriter(l.ioWriterLogger...)
 	str := fmt.Sprintf("%s  %s\t", time.Now().Format("2006-01-02 15:04:05"), logType)
 	if msg != "" {
-		str += fmt.Sprintf("%s. ", msg)
+		str += fmt.Sprintf("\t%s ", msg)
 	}
 	varsJSON, err := json.Marshal(vars)
 	if (err == nil) && (string(varsJSON) != "null") {
