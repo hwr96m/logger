@@ -2,7 +2,6 @@ package logger
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -20,7 +19,7 @@ type LoggerPsql struct {
 
 // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 // подключение к базе
-func OpenPostgres(conf *dbstruct.Config_t) (db *LoggerPsql, err error) {
+/*func OpenPostgres(conf *dbstruct.Config_t) (db *LoggerPsql, err error) {
 	if conf.Login == "" {
 		return nil, fmt.Errorf("parameter Login is null")
 	}
@@ -57,7 +56,7 @@ func OpenPostgres(conf *dbstruct.Config_t) (db *LoggerPsql, err error) {
 		return nil, fmt.Errorf("func OpenPostgres: db.PingContext: %w", err)
 	}
 	return db, err
-}
+}*/
 
 // возвращает структуру, реализующую интерфейс DBLogger_i
 func GetPsql(db *dbstruct.DB_t) *LoggerPsql {
