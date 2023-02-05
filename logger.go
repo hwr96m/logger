@@ -10,16 +10,18 @@ import (
 
 // ------------ Константы, переменные ----------------------------------------------------
 const (
-	DEBUG LogType_t = 0
-	INFO  LogType_t = 1
-	ERROR LogType_t = 2
+	DEBUG     LogType_t = 0
+	INFO      LogType_t = 1
+	ERROR     LogType_t = 2
+	DEBUG_ERR LogType_t = 3
 )
 
 var (
 	LogTypeMap = map[LogType_t]string{
 		0: "DEBUG",
 		1: "INFO",
-		2: "ERROR"}
+		2: "ERROR",
+		3: "DEBUG_ERR"}
 )
 
 // ------------ Типы ----------------------------------------------------
