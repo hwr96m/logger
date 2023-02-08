@@ -26,7 +26,8 @@ var (
 
 // ------------ Типы ----------------------------------------------------
 type Logger_t struct {
-	DebugMode      bool //режим отладки
+	DebugMode      bool   //режим отладки
+	Prefix         string //префикс, добавляется перед msg
 	dbLogger       []dbLogger_t
 	openedFiles    []*os.File  //файлы, открытые через AddFile()
 	ioWriterLogger []io.Writer //интерфейс записи логов в io.Writer
@@ -86,8 +87,12 @@ func (l *Logger_t) AddIOWriter(w io.Writer) error {
 // logType - тип лога, msg - текст сообщения, vars - переменные, преобразуются в JSON строку
 func (l *Logger_t) Print(logType LogType_t, msg string, vars map[string]interface{}) {
 	//пропускаем DEBUG логи, если режим отладки отключен
-	if (logType == DEBUG) && !l.DebugMode {
+	if (logType == DEBUG || logType == DEBUG_ERR) && !l.DebugMode {
 		return
+	}
+	//добавляем префикс к сообщению
+	if l.Prefix != "" {
+		msg = fmt.Sprintf("%s: %s", l.Prefix, msg)
 	}
 	err := l.printIntoDB(logType, msg, vars) //запись логов в бд
 	if err != nil {
