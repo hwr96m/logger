@@ -2,24 +2,40 @@ package logger
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/lib/pq"
-	dbstruct "home.rep/go-libs/db-struct.git"
 )
 
 // ------------ Структуры -----------------------------------------------------------------
 type LoggerPsql struct {
-	*dbstruct.DB_t
+	*DB_t
+}
+
+type Config_t struct {
+	Host     string `json:"Host"`
+	Port     string `json:"Port"`
+	Database string `json:"Database"`
+	Login    string `json:"Login"`
+	Password string `json:"Password"`
+	Scheme   string `json:"Scheme"`
+}
+
+type DB_t struct {
+	*sql.DB
+	Config  *Config_t
+	Timeout time.Duration
 }
 
 //------------ Функции -------------------------------------------------------------------
 
 // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+
 // подключение к базе
-/*func OpenPostgres(conf *dbstruct.Config_t) (db *LoggerPsql, err error) {
+func OpenPostgres(conf *Config_t) (db *DB_t, err error) {
 	if conf.Login == "" {
 		return nil, fmt.Errorf("parameter Login is null")
 	}
@@ -35,31 +51,29 @@ type LoggerPsql struct {
 	if conf.Port == "" {
 		conf.Port = "5432"
 	}
-	db = new(LoggerPsql)
+	db = new(DB_t)
 	db.Timeout = 30 * time.Second
 	db.Config = conf
 	db.DB, err = sql.Open("postgres",
 		fmt.Sprintf(
 			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			conf.Host,
-			conf.Port,
-			conf.Login,
-			conf.Password,
-			conf.Database))
+			db.Config.Host,
+			db.Config.Port,
+			db.Config.Login,
+			db.Config.Password,
+			db.Config.Database))
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), db.Timeout)
-	defer cancel()
-	err = db.PingContext(ctx)
+	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("func OpenPostgres: db.PingContext: %w", err)
+		return nil, fmt.Errorf("func OpenPostgres(): %w", err)
 	}
 	return db, err
-}*/
+}
 
 // возвращает структуру, реализующую интерфейс DBLogger_i
-func GetPsql(db *dbstruct.DB_t) *LoggerPsql {
+func GetPsql(db *DB_t) *LoggerPsql {
 	psql := new(LoggerPsql)
 	psql.DB_t = db
 	return psql

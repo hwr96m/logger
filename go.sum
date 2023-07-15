@@ -1,4 +1,2 @@
-github.com/lib/pq v1.10.7 h1:p7ZhMD+KsSRozJr34udlUrhboJwWAgCg34+/ZZNvZZw=
-github.com/lib/pq v1.10.7/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
-home.rep/go-libs/db-struct.git v1.0.2 h1:Z8pDZanacttDKKoLdKWBI3+4NpPqKQIVlFR9TfQJ9uY=
-home.rep/go-libs/db-struct.git v1.0.2/go.mod h1:T27MQHdvg8mkvX21uTG4r22g0UdC4N9vCpWHQmBCI+I=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
