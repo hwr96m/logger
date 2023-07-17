@@ -1,2 +1,4 @@
+github.com/hwr96m/db-connector v1.0.1 h1:2+BPZkwFfAVB0kpdYHXRn6hUhb969BKyzAyA5Ts2bLc=
+github.com/hwr96m/db-connector v1.0.1/go.mod h1:WpwVFZa8aPut8AUrwVZLPa3FI4mZZ0dwBv5mccBwaO8=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
